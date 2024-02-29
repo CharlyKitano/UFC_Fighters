@@ -1,7 +1,7 @@
 library(stringr)
 
 # Example dataframe
-data = read.csv('D:/IMT MInes Alès/S8/Visualization/Visualization Class/ProjectVisualization5/UFC_Fighters/test_CSV_UFC(2).csv')
+data = read.csv('D:/IMT MInes Alès/S8/Visualization/Visualization Class/ProjectVisualization5/UFC_Fighters/UFC_Complet.csv')
 
 
 extract_before_space <- function(x) {
@@ -42,8 +42,10 @@ convert_time <- function(timestring){
 }
 print(convert_time("3:11"))
 data$Average.fight.time = sapply(data$Average.fight.time, convert_time)
-data_split <- as.data.frame(lapply(data, extract_before_space))
-
+include_columns = setdiff(names(data), c("Place of Birth","Status","Octagon Debut","Fighting style"))
+data_split <- as.data.frame(lapply(data[include_columns], extract_before_space))
+View(data_split)
+data_split[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style")] <- data[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style")]
 
 # Convert the result to a dataframe
 data_split_df <- as.data.frame(data_split)
@@ -51,7 +53,9 @@ data_split_df <- as.data.frame(data_split)
 # summary(data)
 View(data_split_df)
 
-for (col in names(data_split_df)) {
+
+
+for (col in include_columns) {
   if (is.character(data_split_df[[col]])) {
     data_split_df[[col]] <- as.numeric(data_split_df[[col]])
   }
@@ -66,18 +70,21 @@ column_classes <- lapply(data, class)
 
 data_split_df$Name <- data$Name
 
-write.csv2(data_split_df, "Final_data.csv", row.names = FALSE)
-
-
-
-
-
-
-
-
-
-
-
+# write.csv(data_split_df, "Final_data.csv", row.names = FALSE)
+# 
+# 
+# 
+# 
+# library(ggplot2)
+# ggplot(data_split_df, aes(data_split_df$Takedown.avg, data_split_df$Win.by.Method...KO.TKO)) + geom_dotplot(data_split_df$Takedown.avg, data_split_df$Win.by.Method...KO.TKO)
+# 
+# ggplot(data_split_df) + aes(data_split_df$Takedown.avg, data_split_df$Win.by.Method...KO.TKO) + geom_point()
+# 
+# include_columns = setdiff(names(data_split_df), )
+# 
+# pairs(data_split_df)
+# 
+# 
 
 
 
