@@ -11,8 +11,10 @@ runtime: shiny
 
 ```{r setup, echo=FALSE}
 library(shiny)
+library(scales)
 library(shinydashboard)
 library(DT)
+data <- read.csv("C:/Users/HP/Documents/EMA cours/projet visu/Final_data.csv") 
 # UI code
 ui <- fluidPage(
   dashboardPage(
@@ -90,7 +92,17 @@ server <- function(input, output, session) {
     datatable(data)
   })
   output$placeholder_plot <- renderPlot({
-    plot(1, type = "n", xlab = "", ylab = "", xlim = c(0, 1), ylim = c(0, 1), main = "Test")
+    req(input$generate)  # Wait for the button to be clicked
+    
+    # Filter data based on the player's name
+    player_data <- data[data$Name == input$player_info, ]
+    columns_of_interest <- c("Sig..Str..By.Position...Standing", 
+                             "Sig..Str..By.Position...Clinch", 
+                             "Sig..Str..By.Position...Ground")
+    pie_data <- player_data[, columns_of_interest]
+    percentages <- colSums(pie_data) / sum(colSums(pie_data))
+    labels <- paste(names(percentages), scales::percent(percentages))
+    pie(percentages, labels = labels, main = "Distribution of Strikes by Position")
   })
 }
 
