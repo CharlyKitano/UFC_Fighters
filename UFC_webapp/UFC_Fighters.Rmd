@@ -17,19 +17,19 @@ resource_files:
 library(shiny)
 library(shinydashboard)
 library(DT)
-<<<<<<< HEAD
-<<<<<<< HEAD
+# <<<<<<< HEAD
+# <<<<<<< HEAD
 data <- read.csv("Final_data.csv") 
 # UI code 
-=======
-=======
->>>>>>> 847fe8959298a23bc279fb1be39dcd49f99aae35
+# =======
+# =======
+# >>>>>>> 847fe8959298a23bc279fb1be39dcd49f99aae35
 
 # Load data
-data <- read.csv("C:/Users/HP/Documents/EMA cours/projet visu/Final_data.csv")
+# data <- read.csv("C:/Users/HP/Documents/EMA cours/projet visu/Final_data.csv")
 
 # UI code
->>>>>>> 847fe8959298a23bc279fb1be39dcd49f99aae35
+# >>>>>>> 847fe8959298a23bc279fb1be39dcd49f99aae35
 ui <- fluidPage(
   dashboardPage(
     dashboardHeader(title = "UFC"),
