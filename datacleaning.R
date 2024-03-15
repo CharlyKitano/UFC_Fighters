@@ -12,6 +12,9 @@ View(tmp)
 write.csv(tmp, "./ProjectVisualization5/UFC_Fighters/Final_data_raw.csv")
 data <- tmp
 
+data <- data[, -c(which(names(data) %in% c("Striking.accuracy", "Takedown.Accuracy")))]
+
+
 extract_before_space <- function(x) {
 
   if (is.numeric(x)) {
@@ -77,7 +80,7 @@ View(data_split_df)
 
 data_split_df$Name <- data$Name
 
-write.csv(data_split_df, "./UFC_webapp/Final_data.csv", row.names = FALSE)
+write.csv(data_split_df, "./ProjectVisualization5/UFC_Fighters/Final_data.csv", row.names = FALSE)
 # 
 # 
 # 
