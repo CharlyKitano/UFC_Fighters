@@ -1,11 +1,18 @@
 library(stringr)
 
 # Example dataframe
-data = read.csv('D:/IMT MInes Alès/S8/Visualization/Visualization Class/ProjectVisualization5/UFC_Fighters/UFC_Complet.csv')
+data_new = read.csv('D:/IMT MInes Ales/S8/Visualization/Visualization Class/ProjectVisualization5/UFC_Fighters/COMBATANTS_COMPLET.csv')
+data = read.csv('D:/IMT MInes Ales/S8/Visualization/Visualization Class/ProjectVisualization5/UFC_Fighters/UFC_Complet.csv')
 
+
+# Add weight class and gender
+
+tmp <- merge(data, data_new[, c("Name", "gender", "Weight.Class")], by = "Name", all.x = TRUE)
+View(tmp)
+write.csv(tmp, "./ProjectVisualization5/UFC_Fighters/Final_data_raw.csv")
+data <- tmp
 
 extract_before_space <- function(x) {
-
 
   if (is.numeric(x)) {
     # If x is numeric, return x as it is
@@ -42,10 +49,10 @@ convert_time <- function(timestring){
 }
 print(convert_time("3:11"))
 data$Average.fight.time = sapply(data$Average.fight.time, convert_time)
-include_columns = setdiff(names(data), c("Place of Birth","Status","Octagon Debut","Fighting style"))
+include_columns = setdiff(names(data), c("Place of Birth","Status","Octagon Debut","Fighting style", "gender", "Weight.Class"))
 data_split <- as.data.frame(lapply(data[include_columns], extract_before_space))
 View(data_split)
-data_split[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style")] <- data[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style")]
+data_split[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style", "gender", "Weight.Class")] <- data[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style", "gender", "Weight.Class")]
 
 # Convert the result to a dataframe
 data_split_df <- as.data.frame(data_split)
@@ -55,22 +62,22 @@ View(data_split_df)
 
 
 
-for (col in include_columns) {
-  if (is.character(data_split_df[[col]])) {
-    data_split_df[[col]] <- as.numeric(data_split_df[[col]])
-  }
-}
+# for (col in include_columns) {
+#   if (is.character(data_split_df[[col]])) {
+#     data_split_df[[col]] <- as.numeric(data_split_df[[col]])
+#   }
+# }
 
 
 # to check for type of column (if it is int or char or anything else)
-column_classes <- lapply(data, class)
+# column_classes <- lapply(data, class)
 
 # Print the class of each column
 # print(column_classes)
 
 data_split_df$Name <- data$Name
 
-# write.csv(data_split_df, "Final_data.csv", row.names = FALSE)
+write.csv(data_split_df, "./UFC_webapp/Final_data.csv", row.names = FALSE)
 # 
 # 
 # 
