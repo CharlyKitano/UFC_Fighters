@@ -1,0 +1,118 @@
+<!-- ## Column {data-width="650"} -->
+
+<!-- ### Chart A -->
+
+<!-- <https://nicolassutton-charani.shinyapps.io/visu_project_manager_2024/#section-instructions> -->
+
+<!-- ```{r} -->
+<!-- data = read.csv('D:/IMT MInes Alès/S8/Visualization/Visualization Class/ProjectVisualization5/test_CSV_UFC.csv') -->
+<!-- summary(data) -->
+<!-- ``` -->
+
+<!-- ## Column {data-width="350"} -->
+
+<!-- ### Chart B -->
+
+<!-- ```{r} -->
+<!-- library(rAmCharts) -->
+
+<!-- amBarplot(x="Win.by.Method...KO.TKO",y = "Takedown.avg" , data, -->
+<!--        zoom = TRUE, legend = TRUE) -->
+
+<!-- #?amBarplot -->
+
+<!-- names(data) -->
+<!-- ``` -->
+
+<!-- ### Chart C -->
+
+<!-- ```{r} -->
+
+<!-- data -->
+<!-- ``` -->
+<!-- ## Column {data-width="650"} -->
+<!-- ``` -->
+<!-- library(shiny) -->
+<!-- library(shinydashboard) -->
+<!-- library(DT) -->
+<!-- dashboardPage( -->
+<!--   dashboardHeader(title = "UFC"), -->
+<!--   dashboardSidebar( -->
+<!--     sidebarMenu( -->
+<!--       menuItem("General Info", tabName = "general_info"), -->
+<!--       menuItem("Comparison", tabName = "comparison") #think about adding icons -->
+<!--     ) -->
+<!--   ), -->
+<!--   dashboardBody( -->
+<!--     tabItems( -->
+<!--       # General Info tab -->
+<!--       tabItem( -->
+<!--         tabName = "general_info", -->
+<!--         # Left sidebar panel -->
+<!--         fluidRow( -->
+<!--           box( -->
+<!--             title = "General Information", -->
+<!--             status = "primary", -->
+<!--             solidHeader = TRUE, -->
+<!--             collapsible = TRUE, -->
+<!--             fluidRow( -->
+<!--               column(6, -->
+<!--                      textInput("country", "Country:", placeholder = "Enter country")), -->
+<!--               column(6, -->
+<!--                      selectInput("fighting_style", "Fighting Style:", -->
+<!--                                  choices = c("KICKBOXER", "Wrestler", "JIU-JITSU"), -->
+<!--                                  selected = "KICKBOXER") -->
+<!--               ), -->
+<!--               column(6, -->
+<!--                      textInput("country", "Country:", placeholder = "Enter country")), -->
+<!--             ), -->
+<!--             #add other inputs and choices  -->
+<!--             actionButton("get_results", "Get Results", class = "btn-primary") -->
+<!--           ) -->
+
+<!--         ), -->
+
+<!--         fluidRow( -->
+<!--           column(12, -->
+<!--                  DTOutput("placeholder_table") -->
+<!--           ) -->
+<!--         ), -->
+
+
+<!--       ), -->
+<!--       # Comparison tab -->
+<!--       tabItem( -->
+<!--         tabName = "comparison", -->
+<!--         # Right sidebar panel -->
+<!--         fluidRow( -->
+<!--           box( -->
+<!--             title = "Player Comparison", -->
+<!--             status = "warning", -->
+<!--             solidHeader = TRUE, -->
+<!--             collapsible = TRUE, -->
+<!--             fluidRow( -->
+<!--               column(6, textInput("player1", "Player 1:", placeholder = "Enter name")), -->
+<!--               column(6, textInput("player2", "Player 2:", placeholder = "Enter name")) -->
+<!--             ), -->
+<!--             actionButton("compare_players", "Compare Players", class = "btn-warning") -->
+<!--           ), -->
+<!--           box( -->
+<!--             title = "Player Info", -->
+<!--             status = "primary", -->
+<!--             solidHeader = TRUE, -->
+<!--             collapsible = TRUE, -->
+<!--             textInput("player_info", "Player Info:", placeholder = "Enter name") -->
+<!--             , -->
+<!--             actionButton("generate", "Generate Info") -->
+<!--           ), -->
+
+<!--           # Placeholder graph -->
+<!--           fluidRow( -->
+<!--             plotOutput("placeholder_plot", width = "100%") -->
+<!--           ) -->
+<!--         ) -->
+<!--       ) -->
+<!--     ) -->
+<!--   ) -->
+<!-- ) -->
+<!-- ``` -->

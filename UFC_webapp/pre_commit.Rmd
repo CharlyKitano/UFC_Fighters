@@ -1,5 +1,5 @@
 ---
-title: "UFC Fighters"
+title: "pre_commit"
 output:
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -33,7 +33,8 @@ ui <- fluidPage(
       tabItems(
         tabItem(
           tabName = "general_info",
-          fluidRow(
+          # column(6,
+            fluidRow(
               box(
                 title = "Filters",
                 status = "primary",
@@ -43,23 +44,28 @@ ui <- fluidPage(
                 fluidRow(
                   column(12, textInput("country", "Country:", placeholder = "Enter country")),
                   column(12, selectInput("fighting_style", "Fighting Style:",
-                                        choices = unique(data$Fighting.style),
+                                        choices = c("KICKBOXER", "Wrestler", "JIU-JITSU"),
                                         selected = "KICKBOXER")),
                   column(12, textInput("age", "Age:", placeholder = "Enter age")),
                   column(12, selectInput("weight_class", "Weight Class:",
-                                        choices = c("Light Weight", "Female"))),
+                                        choices = c("Light Weight", "Female"),
+                                        selected = "Male")),
                   column(12, selectInput("gender", "Gender:",
-                                        choices = c("Male", "Female")
-                                       )
+                                        choices = c("Male", "Female"),
+                                        selected = "Male")
                   
                   )
                 ),
                 actionButton("get_results", "Get Results", class = "btn-primary")
               )
             ),
-          fluidRow(
-            column(12, DTOutput("placeholder_table"))
-          )
+          # ),
+          # column(6,
+            fluidRow(
+              column(12, DTOutput("placeholder_table"))
+              ),
+            
+          # )
         ),
         tabItem(
           tabName = "comparison",
@@ -114,6 +120,7 @@ server <- function(input, output, session) {
     }
 
   })
+  
   output$placeholder_plot <- renderPlot({
     req(input$generate)  # Wait for the button to be clicked
     

@@ -1,0 +1,5 @@
+If it doesn't work:
+- related to path:
+	+ make sure it's relative path to rmd ("Final_data.csv")
+	+ include it into bundle
+

@@ -1,0 +1,12 @@
+name: UFC_Fighters
+title: UFC_Fighters
+username: visalkao
+account: visalkao
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11362624
+bundleId: 8362384
+url: https://visalkao.shinyapps.io/UFC_Fighters/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
