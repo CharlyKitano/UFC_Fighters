@@ -15,11 +15,18 @@ resource_files:
 
 ```{r setup, echo=FALSE}
 library(shiny)
-library(scales)
 library(shinydashboard)
 library(DT)
+<<<<<<< HEAD
 data <- read.csv("Final_data.csv") 
 # UI code 
+=======
+
+# Load data
+data <- read.csv("C:/Users/HP/Documents/EMA cours/projet visu/Final_data.csv")
+
+# UI code
+>>>>>>> 847fe8959298a23bc279fb1be39dcd49f99aae35
 ui <- fluidPage(
   dashboardPage(
     dashboardHeader(title = "UFC"),
@@ -84,14 +91,22 @@ ui <- fluidPage(
               actionButton("generate", "Generate Info")
             ),
             fluidRow(
-              plotOutput("placeholder_plot", width = "100%")
-            )
+              column(12, tableOutput("player_info_table"), align = "center")
+            ),
+            #think about adding a fluid row here to have them side by side or create uiOutput that has both of them 
+            #think also of checking the column size
+             fluidRow(
+       uiOutput("player_charts_ui"),  
+       uiOutput("player_values_ui")   
+    )
+           
           )
         )
       )
     )
   )
 )
+
 
 # Server code
 server <- function(input, output, session) {
@@ -114,6 +129,76 @@ server <- function(input, output, session) {
     }
 
   })
+  output$player_info_table <- renderTable({
+    req(input$generate)
+    
+    player_info <- data[data$Name == input$player_info, c(
+      "Wins.by.Knockout", 
+      "Wins.by.Submission", 
+      "Wins.by.Decision"
+    )]
+    
+    player_info
+  })
+   output$player_charts_ui <- renderUI({
+    req(input$generate)
+    
+                     tabBox(
+                       title = "",
+                       id = "player_charts",
+                       tabPanel("Strike Percentages", 
+                                plotOutput("strike_percentages_pie")),
+                       tabPanel("Distribution of strikes by position", 
+                                plotOutput("placeholder_plot"))
+                       
+                     
+              
+            )
+     
+     })
+output$player_values_ui <- renderUI({
+  req(input$generate)
+  player_values <- data[data$Name == input$player_info, c( 
+    "Sig..Str..Defense",
+    "Takedown.Defense",
+    "Knockdown.Avg",
+    "Average.fight.time",
+    "Takedown.Accuracy"
+    
+  )]
+  takedown_accuracy <- as.numeric( input$player_values$Takedown.Accuracy)
+  player_values$Takedown.Accuracy[is.na(player_values$Takedown.Accuracy)] <- 0
+  fluidRow(
+  #box(
+   # background = "light-blue",
+    #"Significant Strikes Defense: ", player_values$Sig..Str..Defense,br(),
+    #"Takedown Defense:", player_values$Takedown.Defense,br(),
+    #"Knockdown Avg:", player_values$Knockdown.Avg,br(),
+    #"Average Fight Time: ", player_values$Average.fight.time
+  #),
+   valueBox(width = 3,
+      paste0(player_values$Knockdown.Avg), "Knockdown avg", icon = icon("skull"),
+      color = "orange"
+    ),
+  valueBox(width = 3,
+      paste0( player_values$Average.fight.time, "min"), "Avg fight time", icon = icon("hand-fist"),
+      color = "orange"
+    )
+  ,
+   valueBox(width = 3,
+      paste0(player_values$Takedown.Defense), "Takedown defense", icon = icon("shield"),
+      color = "blue"
+    ),
+   valueBox(width = 3,
+      paste0(player_values$Sig..Str..Defense, "%"), "Sig str defense", 
+      color = "blue"
+    )
+  
+  
+  )
+  
+  
+})
   output$placeholder_plot <- renderPlot({
     req(input$generate)  # Wait for the button to be clicked
     
@@ -124,12 +209,45 @@ server <- function(input, output, session) {
                              "Sig..Str..By.Position...Ground")
     pie_data <- player_data[, columns_of_interest]
     percentages <- colSums(pie_data) / sum(colSums(pie_data))
-    labels <- paste(names(percentages), scales::percent(percentages))
-    pie(percentages, labels = labels, main = "Distribution of Strikes by Position")
+    custom_labels <- paste0(
+      c("Standing", "Clinch", "Ground"), 
+      ": ", 
+      scales::percent(percentages)
+    )
+    pie(percentages, labels = custom_labels, main = "Distribution of Strikes by Position")
+  })
+  
+  output$strike_percentages_pie <- renderPlot({
+    req(input$generate)  # Only display after clicking "Generate Info" button
+    #error in generating if textfield is empty 
+    
+    player_data <- data[data$Name == input$player_info, ]
+    if (nrow(player_data) > 0) {
+      # Fetch strike percentages from data
+      strike_percentages <- c(
+        player_data$Head...Pourcentage, 
+        player_data$Body...Pourcentage, 
+        player_data$Leg...Pourcentage
+      )
+      
+      # Create custom labels with percentages
+      custom_labels <- paste0(
+        c("Head", "Body", "Leg"), 
+        ": ", 
+        strike_percentages, "%"
+      )
+      
+      # Create pie plot
+      pie(strike_percentages, labels = custom_labels, main = "Strike Percentages")
+    } else {
+      HTML("Player not found.")
+    }
   })
 }
 
 # Run the Shiny app
 shinyApp(ui = ui, server = server)
+
+
 
 ```
