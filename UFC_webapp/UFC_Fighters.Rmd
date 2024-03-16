@@ -133,7 +133,7 @@ server <- function(input, output, session) {
 
   })
   output$player_info_table <- renderTable({
-    req(input$generate)
+    req(generate_clicked())
     
     player_info <- data[data$Name == input$player_info, c(
       "Wins.by.Knockout", 
@@ -143,69 +143,54 @@ server <- function(input, output, session) {
     
     player_info
   })
-   output$player_charts_ui <- renderUI({
-    req(input$generate)
+    output$player_charts_ui <- renderUI({
+    req(generate_clicked())
     
-                     tabBox(
-                       title = "",
-                       id = "player_charts",
-                       tabPanel("Strike Percentages", 
-                                plotOutput("strike_percentages_pie")),
-                       tabPanel("Distribution of strikes by position", 
-                                plotOutput("placeholder_plot"))
-                       
-                     
-              
-            )
-     
-     })
+    tabBox(
+      title = "",
+      id = "player_charts",
+      tabPanel("Strike Percentages", 
+               plotOutput("strike_percentages_pie")),
+      tabPanel("Distribution of strikes by position", 
+               plotOutput("placeholder_plot"))
+    )
+  })
 output$player_values_ui <- renderUI({
-  req(input$generate)
-  player_values <- data[data$Name == input$player_info, c( 
-    "Sig..Str..Defense",
-    "Takedown.Defense",
-    "Knockdown.Avg",
-    "Average.fight.time",
-    "Takedown.Accuracy"
+    req(generate_clicked())
     
-  )]
-  takedown_accuracy <- as.numeric( input$player_values$Takedown.Accuracy)
-  player_values$Takedown.Accuracy[is.na(player_values$Takedown.Accuracy)] <- 0
-  fluidRow(
-  #box(
-   # background = "light-blue",
-    #"Significant Strikes Defense: ", player_values$Sig..Str..Defense,br(),
-    #"Takedown Defense:", player_values$Takedown.Defense,br(),
-    #"Knockdown Avg:", player_values$Knockdown.Avg,br(),
-    #"Average Fight Time: ", player_values$Average.fight.time
-  #),
-   valueBox(width = 3,
-      paste0(player_values$Knockdown.Avg), "Knockdown avg", icon = icon("skull"),
-      color = "orange"
-    ),
-  valueBox(width = 3,
-      paste0( player_values$Average.fight.time, "min"), "Avg fight time", icon = icon("hand-fist"),
-      color = "orange"
+    player_values <- data[data$Name == input$player_info, c( 
+      "Sig..Str..Defense",
+      "Takedown.Defense",
+      "Knockdown.Avg",
+      "Average.fight.time",
+      "Takedown.Accuracy"
+    )]
+    
+    takedown_accuracy <- as.numeric(input$player_values$Takedown.Accuracy)
+    player_values$Takedown.Accuracy[is.na(player_values$Takedown.Accuracy)] <- 0
+    
+    fluidRow(
+      valueBox(width = 3,
+               paste0(player_values$Knockdown.Avg), "Knockdown avg", icon = icon("skull"),
+               color = "orange"
+      ),
+      valueBox(width = 3,
+               paste0(player_values$Average.fight.time, "min"), "Avg fight time", icon = icon("hand-fist"),
+               color = "orange"
+      ),
+      valueBox(width = 3,
+               paste0(player_values$Takedown.Defense), "Takedown defense", icon = icon("shield"),
+               color = "blue"
+      ),
+      valueBox(width = 3,
+               paste0(player_values$Sig..Str..Defense, "%"), "Sig str defense", 
+               color = "blue"
+      )
     )
-  ,
-   valueBox(width = 3,
-      paste0(player_values$Takedown.Defense), "Takedown defense", icon = icon("shield"),
-      color = "blue"
-    ),
-   valueBox(width = 3,
-      paste0(player_values$Sig..Str..Defense, "%"), "Sig str defense", 
-      color = "blue"
-    )
-  
-  
-  )
-  
-  
-})
+  })
   output$placeholder_plot <- renderPlot({
-    req(input$generate)  # Wait for the button to be clicked
+    req(generate_clicked())  # Wait for the button to be clicked
     
-    # Filter data based on the player's name
     player_data <- data[data$Name == input$player_info, ]
     columns_of_interest <- c("Sig..Str..By.Position...Standing", 
                              "Sig..Str..By.Position...Clinch", 
@@ -221,30 +206,29 @@ output$player_values_ui <- renderUI({
   })
   
   output$strike_percentages_pie <- renderPlot({
-    req(input$generate)  # Only display after clicking "Generate Info" button
-    #error in generating if textfield is empty 
+    req(generate_clicked())  # Only display after clicking "Generate Info" button
     
     player_data <- data[data$Name == input$player_info, ]
     if (nrow(player_data) > 0) {
-      # Fetch strike percentages from data
       strike_percentages <- c(
         player_data$Head...Pourcentage, 
         player_data$Body...Pourcentage, 
         player_data$Leg...Pourcentage
       )
       
-      # Create custom labels with percentages
       custom_labels <- paste0(
         c("Head", "Body", "Leg"), 
         ": ", 
         strike_percentages, "%"
       )
       
-      # Create pie plot
       pie(strike_percentages, labels = custom_labels, main = "Strike Percentages")
     } else {
       HTML("Player not found.")
     }
+  })
+observeEvent(input$generate, {
+    generate_clicked(TRUE)
   })
 }
 
