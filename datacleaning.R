@@ -6,8 +6,40 @@ data = read.csv('D:/IMT MInes Ales/S8/Visualization/Visualization Class/ProjectV
 
 
 # Add weight class and gender
+data <- data[data$Name != "Ciryl Gane", ]
+data_new <- data_new[data_new$Name != "Ciryl Gane", ]
+data <- data[data$Name != "Aleksa Camur", ]
+data_new <- data_new[data_new$Name != "Aleksa Camur", ]
 
 tmp <- merge(data, data_new[, c("Name", "gender", "Weight.Class")], by = "Name", all.x = TRUE)
+string_contains_comma <- function(input_string) {
+     return(grepl(",", input_string))
+   }
+ 
+ extract_country <- function(Placeofbirth){
+      # Placeofbirth <- "a,b,c"
+       components <- strsplit(Placeofbirth, ",")[[1]]
+       print(components)
+       # print(time_components)
+       # print(components[length(components)])
+       # for (i in 1:length(components)) {
+       #   # Check if current element has a comma
+       #   if (grepl(",", components[i])) {
+       #     # Split the element with the comma
+       #     components[i] <- strsplit(components[i], ",")[[1]]
+       #   }
+       # }
+       # print(components[2])
+       # city <- components[1]
+         # country <- components[-1]
+         # print(length(components))
+       while (grepl(",", components[2])) {
+         components <- strsplit(components[2], ",")[[1]]
+         print(components[2])
+       }
+         return(components[2])
+ }
+tmp["Country"] <- sapply(tmp$Place.of.Birth, extract_country)
 View(tmp)
 write.csv(tmp, "./ProjectVisualization5/UFC_Fighters/Final_data_raw.csv")
 data <- tmp
@@ -42,7 +74,7 @@ data$Sig..Str..Defense <- remove_percent_and_convert(data$Sig..Str..Defense)
 data$Takedown.Defense <- remove_percent_and_convert(data$Takedown.Defense)
 convert_time <- function(timestring){
   time_components <- strsplit(timestring, ":")[[1]]
-  print(time_components)
+  # print(time_components)
   minutes <- as.numeric(time_components[1])
   seconds <- as.numeric(time_components[2])
   
@@ -50,12 +82,12 @@ convert_time <- function(timestring){
   
   return(total)
 }
-print(convert_time("3:11"))
+# print(convert_time("3:11"))
 data$Average.fight.time = sapply(data$Average.fight.time, convert_time)
-include_columns = setdiff(names(data), c("Place of Birth","Status","Octagon Debut","Fighting style", "gender", "Weight.Class"))
+include_columns = setdiff(names(data), c("Place of Birth","Status","Octagon Debut","Fighting style", "gender", "Weight.Class", "Country"))
 data_split <- as.data.frame(lapply(data[include_columns], extract_before_space))
 View(data_split)
-data_split[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style", "gender", "Weight.Class")] <- data[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style", "gender", "Weight.Class")]
+data_split[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style", "gender", "Weight.Class", "Country")] <- data[c("Place.of.Birth","Status","Octagon.Debut","Fighting.style", "gender", "Weight.Class", "Country")]
 
 # Convert the result to a dataframe
 data_split_df <- as.data.frame(data_split)
