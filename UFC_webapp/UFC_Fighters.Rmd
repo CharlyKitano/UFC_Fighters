@@ -1,9 +1,13 @@
 ---
 title: "UFC Fighters"
 output:
+  
   flexdashboard::flex_dashboard:
     orientation: columns
+    scroll : true 
     vertical_layout: fill
+    source_code: embed
+    
 runtime: shiny
 resource_files:
 - Final_data.csv
@@ -19,11 +23,10 @@ library(shinydashboard)
 library(DT)
 # <<<<<<< HEAD
 # <<<<<<< HEAD
-data <- read.csv("Final_data.csv") 
-data_raw <- read.csv("Final_data_raw.csv") 
+data <- read.csv("C:/Users/Eleve/Downloads./Final_Data.csv") 
+data_raw <- read.csv("C:/Users/Eleve/Downloads/Final_data_raw.csv") 
 fightstyle = unique(data$Fighting.style)
 weightclass = unique(data$Weight.Class)
-country = unique(data$Country)
 # UI code 
 # =======
 # =======
@@ -39,8 +42,11 @@ ui <- fluidPage(
     dashboardHeader(title = "UFC"),
     dashboardSidebar(
       sidebarMenu(
+        menuItem("Présentation", tabName = "presentation"),
+        menuItem("Description des données", tabName = "description_des_donnees"),
         menuItem("General Info", tabName = "general_info"),
         menuItem("Comparison", tabName = "comparison")
+        
       )
     ),
     dashboardBody(
@@ -56,10 +62,7 @@ ui <- fluidPage(
                 collapsible = TRUE,
                 width = 12,
                 fluidRow(
-                  # column(12, textInput("country", "Country:", placeholder = "Enter country")),
-                  column(12, selectInput("country", "Country:",
-                                        choices = country
-                                        )),
+                  column(12, textInput("country", "Country:", placeholder = "Enter country")),
                   column(12, selectInput("fighting_style", "Fighting Style:",
                                         choices = fightstyle,
                                         selected = "KICKBOXER")),
@@ -69,21 +72,18 @@ ui <- fluidPage(
                   column(12, selectInput("weight_class", "Weight Class:",
                                         choices = weightclass)),
                   column(12, selectInput("gender", "Gender:",
-                                        choices = c("Male", "Female"), selected = " "
-                                       )),
+                                        choices = c("Male", "Female")
+                                       ),
                   column(6, textInput("height_from", "Height:", placeholder = "From")),
                   column(6, textInput("height_to",".", placeholder = "To")),
                   
-                  
+                  )
                 ),
                 actionButton("get_results", "Get Results", class = "btn-primary")
               )
             ),
           fluidRow(
             column(12, DTOutput("placeholder_table"))
-          # ),
-          # fluidRow(
-          #   # column(12, )
           )
         ),
         tabItem(
@@ -148,22 +148,22 @@ server <- function(input, output, session) {
     
     # Filter by country if provided
     if (!is.null(input$country) && input$country != "") {
-      filtered_data <- filtered_data[filtered_data["Country"] == input$country, ,drop=FALSE]
+      filtered_data <- filtered_data[filtered_data["Place.of.Birth"] == input$country, ,drop=FALSE]
     }
     
     # Filter by fighting style if provided
     if (!is.null(input$fighting_style) && input$fighting_style != "") {
-      filtered_data <- filtered_data[filtered_data["Fighting.style"] == input$fighting_style, ,drop=FALSE]
+      filtered_data <- filtered_data[filtered_data$fighting_style == input$fighting_style, ,drop=FALSE]
     }
     
     #Filter by age if provided
     if (!is.null(input$age) && input$age != "") {
-      filtered_data <- filtered_data[filtered_data$Age == as.numeric(input$age), ]
+      filtered_data <- filtered_data[filtered_data$age == as.numeric(input$age), ]
     }
     
     # Filter by weight class if provided
     if (!is.null(input$weight_class) && input$weight_class != "") {
-      filtered_data <- filtered_data[filtered_data$Weight.Class == input$weight_class, ,drop=FALSE]
+      filtered_data <- filtered_data[filtered_data$weight_class == input$weight_class, ,drop=FALSE]
     }
     
     # Filter by gender if provided
@@ -180,30 +180,8 @@ server <- function(input, output, session) {
       filtered_data <- filtered_data[filtered_data$Height <= input$height_to, ,drop=FALSE]
     }
 
-    column_with_na <- "Name"  # Specify the column with potential NA values
-    filtered_data <- filtered_data[complete.cases(filtered_data[, column_with_na]), ]
-    
     return(datatable(filtered_data))
   })
-#   output$general_info_table <- renderPlot({
-#     
-#     counts <- table(data_raw$Country)
-# 
-# # Plot a pie chart
-#     pie(counts, labels = names(counts), main = "Pie Chart of Unique Values")
-# 
-#     # columns_of_interest <- c("Country", 
-#     #                          "Sig..Str..By.Position...Clinch", 
-#     #                          "Sig..Str..By.Position...Ground")
-#     # pie_data <- player_data[, columns_of_interest]
-#     # percentages <- colSums(pie_data) / sum(colSums(pie_data))
-#     # custom_labels <- paste0(
-#     #   c("Standing", "Clinch", "Ground"), 
-#     #   ": ", 
-#     #   scales::percent(percentages)
-#     # )
-#     # pie(percentages, labels = custom_labels, main = "Distribution of Strikes by Position")
-#   })
   output$player_info_table <- renderTable({
     req(generate_clicked())
     
