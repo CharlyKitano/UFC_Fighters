@@ -151,6 +151,7 @@ Comme pour la majorité des sports, le MMA est sujet aux paris sportifs pour ess
 
 # Server code
 server <- function(input, output, session) {
+  generate_clicked <- reactiveVal(FALSE)
   output$placeholder_table <- renderDT({
     req(input$get_results)
     
