@@ -3,12 +3,15 @@ title: "UFC Fighters"
 output:
   flexdashboard::flex_dashboard:
     orientation: columns
+    scroll: true
     vertical_layout: fill
+    source_code: embed
 runtime: shiny
 resource_files:
 - Final_data.csv
 - Final_data.csv
 - Final_data.csv
+- Final_data_raw.csv
 ---
 
 
@@ -21,10 +24,14 @@ library(DT)
 # <<<<<<< HEAD
 data <- read.csv("Final_data.csv") 
 data_raw <- read.csv("Final_data_raw.csv") 
+country = unique(data$Country)
 fightstyle = unique(data$Fighting.style)
 weightclass = unique(data$Weight.Class)
+
 country = unique(data$Country)
 country<-c(country,"No country")
+
+
 # UI code 
 # =======
 # =======
@@ -40,8 +47,11 @@ ui <- fluidPage(
     dashboardHeader(title = "UFC"),
     dashboardSidebar(
       sidebarMenu(
+        menuItem("Présentation", tabName = "presentation"),
+        menuItem("Description des données", tabName = "description_des_donnees"),
         menuItem("General Info", tabName = "general_info"),
         menuItem("Comparison", tabName = "comparison")
+        
       )
     ),
     dashboardBody(
@@ -57,7 +67,6 @@ ui <- fluidPage(
                 collapsible = TRUE,
                 width = 12,
                 fluidRow(
-                  # column(12, textInput("country", "Country:", placeholder = "Enter country")),
                   column(12, selectInput("country", "Country:",
                                         choices = country
                                         )),
@@ -70,21 +79,18 @@ ui <- fluidPage(
                   column(12, selectInput("weight_class", "Weight Class:",
                                         choices = weightclass)),
                   column(12, selectInput("gender", "Gender:",
-                                        choices = c("Male", "Female"), selected = " "
-                                       )),
+                                        choices = c("Male", "Female")
+                                       ),
                   column(6, textInput("height_from", "Height:", placeholder = "From")),
                   column(6, textInput("height_to",".", placeholder = "To")),
                   
-                  
+                  )
                 ),
                 actionButton("get_results", "Get Results", class = "btn-primary")
               )
             ),
           fluidRow(
             column(12, DTOutput("placeholder_table"))
-          # ),
-          # fluidRow(
-          #   # column(12, )
           )
         ),
         tabItem(
@@ -180,31 +186,12 @@ server <- function(input, output, session) {
     if (!is.null(input$height_to) && input$height_to != "") {
       filtered_data <- filtered_data[filtered_data$Height <= input$height_to, ,drop=FALSE]
     }
-
+    
     column_with_na <- "Name"  # Specify the column with potential NA values
     filtered_data <- filtered_data[complete.cases(filtered_data[, column_with_na]), ]
-    
+
     return(datatable(filtered_data))
   })
-#   output$general_info_table <- renderPlot({
-#     
-#     counts <- table(data_raw$Country)
-# 
-# # Plot a pie chart
-#     pie(counts, labels = names(counts), main = "Pie Chart of Unique Values")
-# 
-#     # columns_of_interest <- c("Country", 
-#     #                          "Sig..Str..By.Position...Clinch", 
-#     #                          "Sig..Str..By.Position...Ground")
-#     # pie_data <- player_data[, columns_of_interest]
-#     # percentages <- colSums(pie_data) / sum(colSums(pie_data))
-#     # custom_labels <- paste0(
-#     #   c("Standing", "Clinch", "Ground"), 
-#     #   ": ", 
-#     #   scales::percent(percentages)
-#     # )
-#     # pie(percentages, labels = custom_labels, main = "Distribution of Strikes by Position")
-#   })
   output$player_info_table <- renderTable({
     req(generate_clicked())
     
