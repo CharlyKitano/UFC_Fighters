@@ -58,6 +58,22 @@ ui <- fluidPage(
 
       tabItems(
         tabItem(
+    tabName = "presentation",
+    fluidRow(
+      box(
+        title = "Contexte du projet",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Le MMA est un sport de combat combinant plusieurs disciplines martiales telles que la boxe, le jiu-jitsu, le muay thaï et la lutte. Les combats se déroulent en 1 contre 1 en plusieurs rounds au cours desquels de nombreuses techniques sont acceptées telles que les coups de poing, les coups de pied, les genoux, les coudes, les prises et les soumissions. Chaque combattant possède sa ou ses techniques de prédilections ainsi que ses points faibles. Les combattants sont séparés en catégories de sexe et de poids pour s’assurer que lors d’un match, les deux adversaires aient un gabarit assez similaire.  
+
+Comme pour la majorité des sports, le MMA est sujet aux paris sportifs pour essayer de prédire qui sera le vainqueur d’un match, mais pas seulement, il est possible de parier sur la méthode de victoire (KO, soumission, décision de l’arbitre), la durée du combat (nombre de rounds ou fin de combat avant une certaine minute), les statistiques du combat (nombre de coup portés, nombre de takedowns réussis, temps passé au sol, …).  Il est évidemment primordial avant de parier sur un combat de connaître les deux combattants qui s’affrontent, ainsi que leurs statistiques et caractéristiques.  "),
+      
+        
+      )
+    )
+  ),
+        tabItem(
           tabName = "general_info",
           fluidRow(
               box(
