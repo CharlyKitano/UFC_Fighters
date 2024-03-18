@@ -251,44 +251,59 @@ output$player_values_ui <- renderUI({
     )
   })
   output$placeholder_plot <- renderPlot({
-    req(generate_clicked())  # Wait for the button to be clicked
-    
-    player_data <- data[data$Name == input$player_info, ]
-    columns_of_interest <- c("Sig..Str..By.Position...Standing", 
-                             "Sig..Str..By.Position...Clinch", 
-                             "Sig..Str..By.Position...Ground")
-    pie_data <- player_data[, columns_of_interest]
+  req(generate_clicked())  # Wait for the button to be clicked
+  
+  player_data <- data[data$Name == input$player_info, ]
+  columns_of_interest <- c("Sig..Str..By.Position...Standing", 
+                           "Sig..Str..By.Position...Clinch", 
+                           "Sig..Str..By.Position...Ground")
+  pie_data <- player_data[, columns_of_interest]
+  
+  # Check if any parameter is NA or if all of them are 0
+  if (anyNA(pie_data) || all(pie_data == 0)) {
+    text <- "No information found about this player"
+    plot.new()
+    text(0.5, 0.5, text, cex = 1.2, col = "red", font = 2)
+  } else {
     percentages <- colSums(pie_data) / sum(colSums(pie_data))
     custom_labels <- paste0(
       c("Standing", "Clinch", "Ground"), 
       ": ", 
       scales::percent(percentages)
     )
+    # Create the pie chart
     pie(percentages, labels = custom_labels, main = "Distribution of Strikes by Position")
-  })
+  }
+})
   
-  output$strike_percentages_pie <- renderPlot({
-    req(generate_clicked())  # Only display after clicking "Generate Info" button
+output$strike_percentages_pie <- renderPlot({
+  req(generate_clicked())  # Only display after clicking "Generate Info" button
+  
+  player_data <- data[data$Name == input$player_info, ]
+  if (nrow(player_data) > 0) {
+    strike_percentages <- c(
+      player_data$Head...Pourcentage, 
+      player_data$Body...Pourcentage, 
+      player_data$Leg...Pourcentage
+    )
     
-    player_data <- data[data$Name == input$player_info, ]
-    if (nrow(player_data) > 0) {
-      strike_percentages <- c(
-        player_data$Head...Pourcentage, 
-        player_data$Body...Pourcentage, 
-        player_data$Leg...Pourcentage
-      )
-      
+    # Check if all percentages are 0
+    if (all(strike_percentages == 0)) {
+      # Return a message when no info is found
+      text <- "No information found about this player"
+      plot.new()
+      text(0.5, 0.5, text, cex = 1.2, col = "red", font = 2)
+    } else {
       custom_labels <- paste0(
         c("Head", "Body", "Leg"), 
         ": ", 
         strike_percentages, "%"
       )
-      
+      # Create the pie chart
       pie(strike_percentages, labels = custom_labels, main = "Strike Percentages")
-    } else {
-      HTML("Player not found.")
     }
-  })
+  }
+})
 observeEvent(input$generate, {
     generate_clicked(TRUE)
   })
