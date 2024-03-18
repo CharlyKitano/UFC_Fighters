@@ -12,14 +12,16 @@ resource_files:
 - Final_data.csv
 - Final_data.csv
 - Final_data_raw.csv
+- neuralnetwork.h5
 ---
-
-
 
 ```{r setup, echo=FALSE}
 library(shiny)
 library(shinydashboard)
 library(DT)
+library(reticulate)
+library(keras)
+library(ggplot2)
 # <<<<<<< HEAD
 # <<<<<<< HEAD
 data <- read.csv("Final_data.csv") 
@@ -31,7 +33,7 @@ weightclass = unique(data$Weight.Class)
 country = unique(data$Country)
 country<-c(country,"No country")
 
-
+model <- load_model_hdf5("neuralnetwork.h5")
 # UI code 
 # =======
 # =======
@@ -51,166 +53,152 @@ ui <- fluidPage(
         menuItem("Description des données", tabName = "description_des_donnees"),
         menuItem("General Info", tabName = "general_info"),
         menuItem("Comparison", tabName = "comparison")
-        
       )
     ),
     dashboardBody(
-
       tabItems(
-
-tabItem(
-    tabName = "presentation",
-    fluidRow(
-      box(
-        title = "Contexte du projet",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Le MMA est un sport de combat combinant plusieurs disciplines martiales telles que la boxe, le jiu-jitsu, le muay thaï et la lutte. Les combats se déroulent en 1 contre 1 en plusieurs rounds au cours desquels de nombreuses techniques sont acceptées telles que les coups de poing, les coups de pied, les genoux, les coudes, les prises et les soumissions. Chaque combattant possède sa ou ses techniques de prédilections ainsi que ses points faibles. Les combattants sont séparés en catégories de sexe et de poids pour s’assurer que lors d’un match, les deux adversaires aient un gabarit assez similaire.
+        tabItem(
+          tabName = "presentation",
+          fluidRow(
+            box(
+            title = "Contexte du projet",
+            status = "primary",
+            solidHeader = TRUE,
+            collapsible = TRUE,
+            p("Le MMA est un sport de combat combinant plusieurs disciplines martiales telles que la boxe, le jiu-jitsu, le muay thaï et la lutte. Les combats se déroulent en 1 contre 1 en plusieurs rounds au cours desquels de nombreuses techniques sont acceptées telles que les coups de poing, les coups de pied, les genoux, les coudes, les prises et les soumissions. Chaque combattant possède sa ou ses techniques de prédilections ainsi que ses points faibles. Les combattants sont séparés en catégories de sexe et de poids pour s’assurer que lors d’un match, les deux adversaires aient un gabarit assez similaire.
 
 Comme pour la majorité des sports, le MMA est sujet aux paris sportifs pour essayer de prédire qui sera le vainqueur d’un match, mais pas seulement, il est possible de parier sur la méthode de victoire (KO, soumission, décision de l’arbitre), la durée du combat (nombre de rounds ou fin de combat avant une certaine minute), les statistiques du combat (nombre de coup portés, nombre de takedowns réussis, temps passé au sol, …).  Il est évidemment primordial avant de parier sur un combat de connaître les deux combattants qui s’affrontent, ainsi que leurs statistiques et caractéristiques.  ")
-      )
-    ),
-    fluidRow(
-      box(
-        title = "Réalisation du projet",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Notre projet se décompose en trois sous parties :  
+            )
+          ),
+          fluidRow(
+          box(
+            title = "Réalisation du projet",
+            status = "primary",
+            solidHeader = TRUE,
+            collapsible = TRUE,
+            p("Notre projet se décompose en trois sous parties :  
 
 La première partie consiste à récolter les données et statistiques de chaque combattant afin de pouvoir y avoir accès rapidement et directement en sélectionnant le combattant en question. Avoir une représentation visuelle des statistiques à l’aide de graphiques et courbes. Les données sont sélectionnables afin de choisir quelles données on souhaite visualiser pour ne pas encombrer l’espace visuel de données inutiles. 
 
 La deuxième partie consiste à comparer les statistiques et gabarits de deux combattants sélectionnés afin de percevoir quel combattant à l’avantage sur l’autre selon quel critère. Cette partie permettra de déceler qui serait le plus susceptible de remporter la victoire lors d’un match et également prévoir de quelle manière selon les données. À l’aide de graphiques il est facile d’observer directement quel combattant à un avantage par rapport à l’autre sur n’importe quelle catégorie choisie. 
 
 La troisième partie se veut être une partie prédictive qui fournira directement une réponse de qui serait le plus susceptible de remporter la victoire entre 2 combattants sélectionnés. Cette partie pourrait servir d’aide pour des parieurs débutants ne connaissant pas encore assez bien le monde du MMA ou alors simplement de réponse à des questionnements classiques de « qui est le plus fort entre ces deux-là ? ». Mais cette partie ne servira évidemment pas de réponse certaine au résultat d’un match car chaque match est imprédictible à 100 % même en ayant accès à toutes les données du monde. ")
-      )
-    )
-  ),
-tabItem(tabName = "description_des_donnees",
-    fluidRow(
-box(title = "Télécharger le dataset",
-                status = "primary",
-                solidHeader = TRUE,
-                collapsible = TRUE,
-                downloadButton("downloadData", "Télécharger le dataset au format CSV")),
-      box(title = "Description des données",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Voici une explication de chaque colonne du dataset."),
-        box(title = "	Sig. Str. By Position - Standing",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Pourcentage de coups significatifs donnés en étant debout")),
-        box(title = "	Sig. Str. By Position - Clinch",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Pourcentage de coups significatifs donnés en étant en clinch")),
-        box(title = "	Sig. Str. By Position - Ground",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Pourcentage de coups significatifs donnés en étant au sol")),
-        box(title = "Win by Method - KO/TKO",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Nombre de victoires par KO ou KO technique")),
-        
-        box(title = "Win by Method - SUB",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Nombre de victoires par soumission")),
-        
-        box(title = "Win by Method - DEC",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Nombre de victoires par décision")),
-        
-        box(title = "Height, Reach, leg reach",
-        status = "primary",
-        solidHeader = TRUE,
-        collapsible = TRUE,
-        p("Respectivement Taille, Envergure et longueur des jambes en inches, 1 inch = 2.54 cm ")),
-        
-        )
-        )
-    )
-        ,
-
-
-          tabItem(tabName = "general_info",
-          fluidRow(
-              box(
-                title = "Filters",
-                status = "primary",
-                solidHeader = TRUE,
-                collapsible = TRUE,
-                width = 12,
-                fluidRow(
-                  column(12, selectInput("country", "Country:",
-                                        choices = country
-                                        )),
-                  column(12, selectInput("fighting_style", "Fighting Style:",
-                                        choices = fightstyle,
-                                        selected = "KICKBOXER")),
-                  column(12, textInput("age", "Age:", placeholder = "Enter age")),
-                  # column(12, selectInput("fighting_style", "Fighting Style:")),
-                  
-                  column(12, selectInput("weight_class", "Weight Class:",
-                                        choices = weightclass)),
-                  column(12, selectInput("gender", "Gender:",
-                                        choices = c("Male", "Female")
-                                       ),
-                  column(6, textInput("height_from", "Height:", placeholder = "From")),
-                  column(6, textInput("height_to",".", placeholder = "To")),
-                  
-                  )
-                ),
-                actionButton("get_results", "Get Results", class = "btn-primary")
-              )
-            ),
-          fluidRow(
-            column(12, DTOutput("placeholder_table"))
+            )
           )
+        ),
+        tabItem(
+          tabName = "description_des_donnees",
+          fluidRow(
+          box(title = "Télécharger le dataset",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              downloadButton("downloadData", "Télécharger le dataset au format CSV")),
+              box(title = "Description des données",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Voici une explication de chaque colonne du dataset."),
+              box(title = "	Sig. Str. By Position - Standing",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Pourcentage de coups significatifs donnés en étant debout")),
+              box(title = "	Sig. Str. By Position - Clinch",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Pourcentage de coups significatifs donnés en étant en clinch")),
+              box(title = "	Sig. Str. By Position - Ground",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Pourcentage de coups significatifs donnés en étant au sol")),
+              box(title = "Win by Method - KO/TKO",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Nombre de victoires par KO ou KO technique")),
+        
+              box(title = "Win by Method - SUB",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Nombre de victoires par soumission")),
+        
+              box(title = "Win by Method - DEC",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Nombre de victoires par décision")),
+        
+              box(title = "Height, Reach, leg reach",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              p("Respectivement Taille, Envergure et longueur des jambes en inches, 1 inch = 2.54 cm ")),
+              )
+          )
+        ),
+        tabItem(tabName = "general_info",
+        fluidRow(
+            box(
+            title = "Filters",
+            status = "primary",
+            solidHeader = TRUE,
+            collapsible = TRUE,
+            width = 12,
+            fluidRow(
+              column(12, selectInput("country", "Country:",choices = country)),
+              column(12, selectInput("fighting_style", "Fighting Style:",
+                                      choices = fightstyle,
+                                      selected = "KICKBOXER")),
+              column(12, textInput("age", "Age:", placeholder = "Enter age")),
+              column(12, selectInput("weight_class", "Weight Class:",
+                                      choices = weightclass)),
+              column(12, selectInput("gender", "Gender:", 
+                                      choices = c("Male", "Female"))),
+              column(6, textInput("height_from", "Height:", placeholder = "From")),
+              column(6, textInput("height_to",".", placeholder = "To")),
+              ),
+            actionButton("get_results", "Get Results", class = "btn-primary")
+            )
+              
+        ),
+        fluidRow(column(12, DTOutput("placeholder_table")))
         ),
         tabItem(
           tabName = "comparison",
           fluidRow(
-            box(
-              title = "Player Comparison",
-              status = "warning",
-              solidHeader = TRUE,
-              collapsible = TRUE,
-              fluidRow(
-                column(6, textInput("player1", "Player 1:", placeholder = "Enter name")),
-                column(6, textInput("player2", "Player 2:", placeholder = "Enter name"))
-              ),
-              actionButton("compare_players", "Compare Players", class = "btn-warning")
+            box(title = "Player Comparison",
+                status = "warning",
+                solidHeader = TRUE,
+                collapsible = TRUE,
+                fluidRow(
+                column(6, selectInput("player1", "Fighter 1:", 
+                                      choices = unique(data$Name))),
+                column(6, selectInput("player2", "Fighter 2:",
+                                      choices = unique(data$Name)))
+                ),
+                actionButton("compare_players", "Compare Players", class = "btn-warning")
+                ),
+            box(title = "Player Info",
+                status = "primary",
+                solidHeader = TRUE,
+                collapsible = TRUE,
+                textInput("player_info", "Player Info:", placeholder = "Enter name"),
+                actionButton("generate", "Generate Info")
             ),
-            box(
-              title = "Player Info",
-              status = "primary",
-              solidHeader = TRUE,
-              collapsible = TRUE,
-              textInput("player_info", "Player Info:", placeholder = "Enter name"),
-              actionButton("generate", "Generate Info")
+            fluidRow(
+              column(6, plotOutput("comparison_plot"), align = "center")
             ),
             fluidRow(
               column(12, tableOutput("player_info_table"), align = "center")
             ),
-            #think about adding a fluid row here to have them side by side or create uiOutput that has both of them 
-            #think also of checking the column size
-             fluidRow(
-       uiOutput("player_charts_ui"),  
-       uiOutput("player_values_ui")   
-    )
-           
+            fluidRow(
+              uiOutput("player_charts_ui"),  
+              uiOutput("player_values_ui")   
+            )
           )
         )
       )
@@ -224,20 +212,6 @@ server <- function(input, output, session) {
   generate_clicked <- reactiveVal(FALSE)
   output$placeholder_table <- renderDT({
     req(input$get_results)
-    
-    # if (!is.null(input$country) && !is.null(input$age) ) {
-    #    # Based on the provided inputs, generate or filter the datatable
-    # 
-    #    filtered_data <- data[data["Place.of.Birth"] == input$country & data$Age == input$age,,drop=FALSE]
-    #    print(filtered_data)
-    # 
-    # 
-    # 
-    # 
-    # 
-    #   return(datatable(filtered_data))  # Render the datatable with the filtered data
-    # }
-    
     filtered_data <- data_raw
     
     # Filter by country if provided
@@ -279,6 +253,7 @@ server <- function(input, output, session) {
 
     return(datatable(filtered_data))
   })
+  
   output$player_info_table <- renderTable({
     req(generate_clicked())
     
@@ -290,7 +265,8 @@ server <- function(input, output, session) {
     
     player_info
   })
-    output$player_charts_ui <- renderUI({
+  
+  output$player_charts_ui <- renderUI({
     req(generate_clicked())
     
     tabBox(
@@ -302,7 +278,8 @@ server <- function(input, output, session) {
                plotOutput("placeholder_plot"))
     )
   })
-output$player_values_ui <- renderUI({
+    
+  output$player_values_ui <- renderUI({
     req(generate_clicked())
     
     player_values <- data[data$Name == input$player_info, c( 
@@ -335,64 +312,115 @@ output$player_values_ui <- renderUI({
       )
     )
   })
+
   output$placeholder_plot <- renderPlot({
-  req(generate_clicked())  # Wait for the button to be clicked
+    req(generate_clicked())  # Wait for the button to be clicked
   
-  player_data <- data[data$Name == input$player_info, ]
-  columns_of_interest <- c("Sig..Str..By.Position...Standing", 
-                           "Sig..Str..By.Position...Clinch", 
-                           "Sig..Str..By.Position...Ground")
-  pie_data <- player_data[, columns_of_interest]
+    player_data <- data[data$Name == input$player_info, ]
+    columns_of_interest <- c("Sig..Str..By.Position...Standing", 
+                            "Sig..Str..By.Position...Clinch", 
+                            "Sig..Str..By.Position...Ground")
+    pie_data <- player_data[, columns_of_interest]
   
-  # Check if any parameter is NA or if all of them are 0
-  if (anyNA(pie_data) || all(pie_data == 0)) {
-    text <- "No information found about this player"
-    plot.new()
-    text(0.5, 0.5, text, cex = 1.2, col = "red", font = 2)
-  } else {
-    percentages <- colSums(pie_data) / sum(colSums(pie_data))
-    custom_labels <- paste0(
-      c("Standing", "Clinch", "Ground"), 
-      ": ", 
-      scales::percent(percentages)
-    )
-    # Create the pie chart
-    pie(percentages, labels = custom_labels, main = "Distribution of Strikes by Position")
-  }
-})
-  
-output$strike_percentages_pie <- renderPlot({
-  req(generate_clicked())  # Only display after clicking "Generate Info" button
-  
-  player_data <- data[data$Name == input$player_info, ]
-  if (nrow(player_data) > 0) {
-    strike_percentages <- c(
-      player_data$Head...Pourcentage, 
-      player_data$Body...Pourcentage, 
-      player_data$Leg...Pourcentage
-    )
-    
-    # Check if all percentages are 0
-    if (all(strike_percentages == 0)) {
-      # Return a message when no info is found
+    # Check if any parameter is NA or if all of them are 0
+    if (anyNA(pie_data) || all(pie_data == 0)) {
       text <- "No information found about this player"
       plot.new()
       text(0.5, 0.5, text, cex = 1.2, col = "red", font = 2)
     } else {
+      percentages <- colSums(pie_data) / sum(colSums(pie_data))
       custom_labels <- paste0(
+      c("Standing", "Clinch", "Ground"), 
+      ": ", 
+      scales::percent(percentages)
+      )
+      # Create the pie chart
+      pie(percentages, labels = custom_labels, main = "Distribution of Strikes by Position")
+    }
+  })
+  
+  output$strike_percentages_pie <- renderPlot({
+    req(generate_clicked())  # Only display after clicking "Generate Info" button
+  
+    player_data <- data[data$Name == input$player_info, ]
+    if (nrow(player_data) > 0) {
+      strike_percentages <- c(
+      player_data$Head...Pourcentage, 
+      player_data$Body...Pourcentage, 
+      player_data$Leg...Pourcentage
+      )
+    
+      # Check if all percentages are 0
+      if (all(strike_percentages == 0)) {
+        # Return a message when no info is found
+        text <- "No information found about this player"
+        plot.new()
+        text(0.5, 0.5, text, cex = 1.2, col = "red", font = 2)
+        } else {
+        custom_labels <- paste0(
         c("Head", "Body", "Leg"), 
         ": ", 
         strike_percentages, "%"
-      )
-      # Create the pie chart
-      pie(strike_percentages, labels = custom_labels, main = "Strike Percentages")
-    }
-  }
-})
-observeEvent(input$generate, {
+        )
+        # Create the pie chart
+        pie(strike_percentages, labels = custom_labels, main = "Strike Percentages")
+        }
+      }
+  })
+  
+  observeEvent(input$generate, {
     generate_clicked(TRUE)
   })
-output$downloadData <- downloadHandler(
+  
+  predict_function <- function(input_vector) {
+    input_matrix <- matrix(input_vector, nrow = 1)
+    prediction <- model$predict(input_matrix)
+    return(prediction)
+  }
+  
+  observeEvent(input$compare_players, {
+      if (input$player1 != "" && input$player2 != "") {
+         player1_data <- data[data$Name == input$player1,]
+         player2_data <- data[data$Name == input$player2,]
+         player1_data[is.na(player1_data)] <- 0
+         player2_data[is.na(player2_data)] <- 0
+         player_diff_vector <- c(
+            player1_data$Height - player2_data$Height,
+            player1_data$Reach - player2_data$Reach,
+            player1_data$Age - player2_data$Age,
+            ( player1_data$Wins.by.Submission + player1_data$Wins.by.Knockout + player1_data$Wins.by.Decision ) - ( player2_data$Wins.by.Submission + player2_data$Wins.by.Knockout + player2_data$Wins.by.Decision ),
+            ( player1_data$Sig..Str..By.Position...Standing + player1_data$Sig..Str..By.Position...Clinch + player1_data$Sig..Str..By.Position...Ground) - ( player2_data$Sig..Str..By.Position...Standing + player2_data$Sig..Str..By.Position...Clinch + player2_data$Sig..Str..By.Position...Ground),
+            player1_data$Submission.avg - player2_data$Submission.avg,
+            player1_data$Takedown.avg - player2_data$Takedown.avg
+         )
+         
+         prediction <- predict_function(player_diff_vector)
+         
+         output$comparison_plot <- renderPlot({
+            results <- data.frame(
+            Class = c('Win Player 1', 'Win Player 2'),
+            Probability = as.numeric(prediction)
+         )
+    
+         # Normalize probabilities to sum to 1
+         results$Probability <- results$Probability / sum(results$Probability)
+    
+         gg <- ggplot(results, aes(x = "", y = Probability, fill = Class)) +
+          geom_bar(stat = 'identity', position = "fill") +
+          coord_flip() +  # Horizontal bars
+          scale_y_continuous(labels = scales::percent_format()) +
+          geom_text(aes(label = scales::percent(Probability)), position = position_fill(vjust = 0.5)) +
+          labs(y = 'Probability', x = '', fill = '') +
+          theme_minimal() +
+          theme(axis.title.y = element_blank(), axis.ticks.y = element_blank(), axis.text.y = element_blank()) +
+          guides(fill = guide_legend(title = "Prediction"))
+    
+         gg
+         })
+      }
+  })
+  
+  output$downloadData <- downloadHandler(
     filename = function() {
       paste("Final_data.csv", sep = "")
     },
