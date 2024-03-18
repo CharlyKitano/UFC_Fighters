@@ -397,7 +397,7 @@ output$downloadData <- downloadHandler(
       paste("Final_data.csv", sep = "")
     },
     content = function(file) {
-      write.csv(donnees_mma, file, row.names = FALSE)
+      write.csv("Final_data.csv", file, row.names = FALSE)
     }
   )
 }
