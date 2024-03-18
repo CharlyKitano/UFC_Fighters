@@ -74,6 +74,85 @@ Comme pour la majorité des sports, le MMA est sujet aux paris sportifs pour ess
     )
   ),
         tabItem(
+tabItem(
+    tabName = "presentation",
+    fluidRow(
+      box(
+        title = "Contexte du projet",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Le MMA est un sport de combat combinant plusieurs disciplines martiales telles que la boxe, le jiu-jitsu, le muay thaï et la lutte. Les combats se déroulent en 1 contre 1 en plusieurs rounds au cours desquels de nombreuses techniques sont acceptées telles que les coups de poing, les coups de pied, les genoux, les coudes, les prises et les soumissions. Chaque combattant possède sa ou ses techniques de prédilections ainsi que ses points faibles. Les combattants sont séparés en catégories de sexe et de poids pour s’assurer que lors d’un match, les deux adversaires aient un gabarit assez similaire.
+
+Comme pour la majorité des sports, le MMA est sujet aux paris sportifs pour essayer de prédire qui sera le vainqueur d’un match, mais pas seulement, il est possible de parier sur la méthode de victoire (KO, soumission, décision de l’arbitre), la durée du combat (nombre de rounds ou fin de combat avant une certaine minute), les statistiques du combat (nombre de coup portés, nombre de takedowns réussis, temps passé au sol, …).  Il est évidemment primordial avant de parier sur un combat de connaître les deux combattants qui s’affrontent, ainsi que leurs statistiques et caractéristiques.  ")
+      )
+    ),
+    fluidRow(
+      box(
+        title = "Réalisation du projet",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Notre projet se décompose en trois sous parties :  
+
+La première partie consiste à récolter les données et statistiques de chaque combattant afin de pouvoir y avoir accès rapidement et directement en sélectionnant le combattant en question. Avoir une représentation visuelle des statistiques à l’aide de graphiques et courbes. Les données sont sélectionnables afin de choisir quelles données on souhaite visualiser pour ne pas encombrer l’espace visuel de données inutiles. 
+
+La deuxième partie consiste à comparer les statistiques et gabarits de deux combattants sélectionnés afin de percevoir quel combattant à l’avantage sur l’autre selon quel critère. Cette partie permettra de déceler qui serait le plus susceptible de remporter la victoire lors d’un match et également prévoir de quelle manière selon les données. À l’aide de graphiques il est facile d’observer directement quel combattant à un avantage par rapport à l’autre sur n’importe quelle catégorie choisie. 
+
+La troisième partie se veut être une partie prédictive qui fournira directement une réponse de qui serait le plus susceptible de remporter la victoire entre 2 combattants sélectionnés. Cette partie pourrait servir d’aide pour des parieurs débutants ne connaissant pas encore assez bien le monde du MMA ou alors simplement de réponse à des questionnements classiques de « qui est le plus fort entre ces deux-là ? ». Mais cette partie ne servira évidemment pas de réponse certaine au résultat d’un match car chaque match est imprédictible à 100 % même en ayant accès à toutes les données du monde. ")
+      )
+    )
+  ),
+tabItem(tabName = "description_des_donnees",
+    fluidRow(
+      box(title = "Description des données",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Voici une explication de chaque colonne du dataset."),
+        box(title = "	Sig. Str. By Position - Standing",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Pourcentage de coups significatifs donnés en étant debout")),
+        box(title = "	Sig. Str. By Position - Clinch",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Pourcentage de coups significatifs donnés en étant en clinch")),
+        box(title = "	Sig. Str. By Position - Ground",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Pourcentage de coups significatifs donnés en étant au sol")),
+        box(title = "Win by Method - KO/TKO",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Nombre de victoires par KO ou KO technique")),
+        
+        box(title = "Win by Method - SUB",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Nombre de victoires par soumission")),
+        
+        box(title = "Win by Method - DEC",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Nombre de victoires par décision")),
+        
+        box(title = "Height, Reach, leg reach",
+        status = "primary",
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        p("Respectivement Taille, Envergure et longueur des jambes en inches, 1 inch = 2.54 cm ")),
+        
+        )
+        )
+    )
+        ,
           tabName = "general_info",
           fluidRow(
               box(
