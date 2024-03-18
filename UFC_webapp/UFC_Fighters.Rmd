@@ -89,6 +89,11 @@ La troisième partie se veut être une partie prédictive qui fournira directeme
   ),
 tabItem(tabName = "description_des_donnees",
     fluidRow(
+box(title = "Télécharger le dataset",
+                status = "primary",
+                solidHeader = TRUE,
+                collapsible = TRUE,
+                downloadButton("downloadData", "Télécharger le dataset au format CSV")),
       box(title = "Description des données",
         status = "primary",
         solidHeader = TRUE,
@@ -387,6 +392,14 @@ output$strike_percentages_pie <- renderPlot({
 observeEvent(input$generate, {
     generate_clicked(TRUE)
   })
+output$downloadData <- downloadHandler(
+    filename = function() {
+      paste("Final_data.csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(donnees_mma, file, row.names = FALSE)
+    }
+  )
 }
 
 # Run the Shiny app
